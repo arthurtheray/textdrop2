@@ -44,6 +44,16 @@ npm run start
 ```
 По умолчанию сервер слушает порт `3000`. На VPS можно использовать reverse proxy (Nginx / Caddy) и HTTPS-сертификаты для домена `textdrop.threy1.com`.
 
+## Развертывание в Docker
+В репозитории есть пример `deploy/compose.yaml`, который поднимает приложение и MongoDB. Перед запуском:
+1. Скопируйте `deploy/textdrop.env.example` в `deploy/textdrop.env` и укажите реальные креды.
+2. Замените в `deploy/compose.yaml` домен в Traefik-лейблах и название внешней сети на свои значения.
+3. Соберите образ и запустите стек:
+   ```bash
+   docker compose -f deploy/compose.yaml build
+   docker compose -f deploy/compose.yaml up -d
+   ```
+
 ### Systemd unit (пример)
 ```ini
 [Unit]

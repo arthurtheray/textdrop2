@@ -1,0 +1,44 @@
+services:
+  textdrop:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: textdrop:local
+    env_file:
+      - ./textdrop.env
+    environment:
+      - PORT=3000
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    networks:
+      - textdrop-internal
+      - traefik-proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.textdrop.rule=Host(`textdrop.example.com`)
+      - traefik.http.routers.textdrop.entrypoints=websecure
+      - traefik.http.routers.textdrop.tls.certresolver=letsencrypt
+      - traefik.http.services.textdrop.loadbalancer.server.port=3000
+      - com.centurylinklabs.watchtower.enable=true
+
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: textdrop
+      MONGO_INITDB_ROOT_USERNAME: textdrop
+      MONGO_INITDB_ROOT_PASSWORD: change-me
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - textdrop-internal
+
+volumes:
+  mongo-data:
+
+networks:
+  textdrop-internal:
+    driver: bridge
+  traefik-proxy:
+    external: true
